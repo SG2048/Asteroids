@@ -2,7 +2,7 @@ let canvas = document.getElementById("gameWindow")
 let info = document.getElementById("info")
 console.log("hi", canvas)
 
-let x = 120, y = 120, dx = 0, dy = 0, lastTime = 0
+let square = new Square(100, 100, 10, 10)
 
 
 
@@ -13,7 +13,7 @@ function draw(){
     ctx.clearRect(0,0,1000,1000)
     //console.log("hi", ctx)
     ctx.strokeRect(50, 50, 100, 100)
-    ctx.fillRect(x, y, 10, 10)
+    ctx.fillRect(square.s.x, square.s.y, 10, 10)
     //ctx.stroke()
 }
 
@@ -21,10 +21,10 @@ document.addEventListener("keydown", keyListener)
 
 function keyListener(e){
     console.log("key", e);
-    if (e.key === "ArrowLeft") dx -= 1;
-    if (e.key === "ArrowRight") dx += 1;
-    if (e.key === "ArrowUp") dy -= 1;
-    if (e.key === "ArrowDown") dy += 1;
+    if (e.key === "ArrowLeft") square.accelerate(new Vec);
+    if (e.key === "ArrowRight") square.s.x += 1;
+    if (e.key === "ArrowUp") square.v.y -= 1;
+    if (e.key === "ArrowDown") square.v.y += 1;
 }
 
 function checkBounds (){
@@ -34,12 +34,12 @@ if (y > 150) {dy = -dy}
 if (y < 50) {dy = -dy}
 }
 
-// function update(){
-//     console.log(x, y);
-//     checkBounds()
-//     x += dx; y += dy
-//     draw()
-// }
+function update(){
+    console.log(x, y);
+    checkBounds()
+    x += dx; y += dy
+    draw()
+}
 
  //setInterval(update, 100)
 
