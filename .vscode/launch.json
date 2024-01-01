@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "Launch Desktop location Chrome",
             "request": "launch",
@@ -16,7 +17,7 @@
             "name": "Launch Chrome",
             "request": "launch",
             "type": "chrome",
-            "url": "C:\\Users\\Paul\\Documents\\GitHub\\Asteroids\\src\\Asteroids.html",
+            "url": "C:\\Users\\Paul\\Documents\\GitHub\\Asteroids\\src\\simulation.html",
             "webRoot": "${workspaceFolder}"
         },
         {

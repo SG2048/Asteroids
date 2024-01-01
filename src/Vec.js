@@ -25,7 +25,7 @@ class Vec{
         return this.scale(1/this.mag())
     }
     theta() {
-        return Math.atan(this.x/this.y)
+        return (Math.atan2(this.y, this.x) + 2 * Math.PI )% (2 * Math.PI)
     }
     cCoords() {
         return [this.mag(), this.theta()]
