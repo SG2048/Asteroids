@@ -20,8 +20,10 @@ draw()
 
 //console.log(objects[0].isInside(new Vec(240, 240)), objects[0].isInside(new Vec(30, 30)))
 //console.log(a.subtract(new Vec(2, 2)))
-//console.log(new Vec(100, 100).mid(new Vec(200, 200)))
+
 //console.log(a.mag())
+
+
 
 function keyListener(e) {
     objects[0].accelerate(e.key)
@@ -88,6 +90,8 @@ function drawArrowRel(a, da) {
 }
 
 function update(t) {
+    let vec = new Vec(0,0)
+    // console.log(objects[0].convertLocalToGlobal(vec), objects[0].convertLocalToGlobal(vec) );
     let dt = (t - lastTime) / 50
     objects.forEach((o) => o.checkBounds(500, 500))
     objects.forEach((o) => o.update(dt))

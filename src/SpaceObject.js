@@ -41,7 +41,15 @@ class SpaceObject {
   }
 
   getShape () {
-    return this.baseShape.map((p) => p.rotate(this.theta).add(this.s))
+    return this.baseShape.map((p) => this.convertLocalToGlobal(p))
+  }
+
+  convertLocalToGlobal(p){
+    return p.rotate(this.theta).add(this.s)
+  }
+
+  convertGobalToLocal(p){
+    return p.add(subtract.s).rotate(-this.theta)
   }
 
   facing () {
@@ -52,13 +60,21 @@ class SpaceObject {
     return !a.every(p => !this.isInside(p))
   }
 
+  getPointPairs () {
+    return this.getShape().map((v, i, a) => [a.at(i-1), a.at(i)])
+  }
+
+  getTriangles () {
+    return this.getPointPairs().map(v => [v[0], v[1], this.s])
+  }
+
   isInside (p) {
-    const points = this.getShape()
-    const lines = []
-    points.push(points[0])
-    for (let i = 0; i < points.length - 1; i++) {
-      lines.push([points[i], points[i + 1]])
-    }
+    //  console.log(this.getTriangles());
+    //  console.log(...this.getTriangles().flat());
+    //  console.log();
+    const lines = this.getPointPairs()
+    // console.log(...lines.flat());
+
     const sides = lines.map(([a, b]) => {
       return b.subtract(a).cross(p.subtract(a)) > 0
     })
