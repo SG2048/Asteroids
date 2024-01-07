@@ -65,27 +65,34 @@ class SpaceObject {
   }
 
   getTriangles () {
-    return this.getPointPairs().map(v => [v[0], v[1], this.s])
+    return this.getPointPairs().map(v => new Triangle(v[0], v[1], this.s))
+    // return this.getPointPairs().map(v => [v[0], v[1], this.s])
   }
 
   isInside (p) {
-    //  console.log(this.getTriangles());
-    //  console.log(...this.getTriangles().flat());
-    //  console.log();
-    const lines = this.getPointPairs()
-    // console.log(...lines.flat());
+    // //  console.log(this.getTriangles());
+    // //  console.log(...this.getTriangles().flat());
+    // //  console.log();
+    // const lines = this.getPointPairs()
+    // // console.log(...lines.flat());
 
-    const sides = lines.map(([a, b]) => {
-      return b.subtract(a).cross(p.subtract(a)) > 0
-    })
-    const inside = sides.every((b) => b === sides[0])
+    // const sides = lines.map(([a, b]) => {
+    //   return b.subtract(a).cross(p.subtract(a)) > 0
+    // })
+    // const inside = sides.every((b) => b === sides[0])
 
-    return inside
+    // return inside
 
-    // let r = this.baseShape[0].mag()
-    // let p2 = p.subtract(this.s).mag()
-    // console.log(r, p2)
-    // return p2<r
+    // // let r = this.baseShape[0].mag()
+    // // let p2 = p.subtract(this.s).mag()
+    // // console.log(r, p2)
+    // // return p2<r
+
+  const triangles = this.getTriangles()
+
+  return !triangles.every(t => !t.isInside(p))
+   
+
   }
 
   receiveImpulse (j) {
