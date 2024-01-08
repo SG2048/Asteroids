@@ -10,6 +10,20 @@ this.vertices = [a, b, c]
       //  return lines
       return this.vertices.map((v, i, a) => [a.at(i - 1),a.at(i)])
     }
+
+    
+  isInside (p) {
+    let thetas = this.vertices.map(v => v.subtract(p).theta() * 180 / Math.PI)
+    const lines = this.getPointPairs()
+    // console.log(...lines.flat());
+    const sides = lines.map(([a, b]) => {
+      return b.subtract(a).cross(p.subtract(a)) > 0
+    })
+     const inside = sides.every((b) => b === sides[0])
+
+     return inside
+  }
+  
 }
 let t1 = new Triangle(new Vec(0, 5), new Vec(5, 0)) 
 console.log(t1.getPointPairs())

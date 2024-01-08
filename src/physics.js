@@ -123,7 +123,7 @@ function makeAsteroidShape(size, points) {
     for (let i = 1; i < points; i++) {
         angle = ((Math.PI * 2) / points) * i
         //console.log(angle)
-        coords.push(p1.rotate(angle).scale(Math.random() * 0.4 + 0.8))
+        coords.push(p1.rotate(angle).scale(Math.random() * 0.6 + 0.2))
         //console.log(coords)
     }
     return coords

@@ -38,8 +38,25 @@ class SpaceObject {
         }
     }
     getShape() {
-        return this.baseShape.map((p) => p.rotate(this.theta).add(this.s))
+        return this.baseShape.map((p) => this.convertGlobalToLocal(p))
     }
+
+    convertGlobalToLocal(p){
+        return p.rotate(this.theta).add(this.s)
+    }
+    convertLocalToGlobal(p){
+        return p.subtract(this.s).rotate(-this.theta)
+    }
+
+    getPointPairs () {
+        return this.getShape().map((v, i, a) => [a.at(i-1), a.at(i)])
+      }
+    
+      getTriangles () {
+        return this.getPointPairs().map(v => new Triangle(v[0], v[1], this.s))
+        // return this.getPointPairs().map(v => [v[0], v[1], this.s])
+      }
+
     facing() {
         return new Vec(0, -1).rotate(this.theta)
     }
@@ -47,23 +64,27 @@ class SpaceObject {
     return !a.every(p => !this.isInside(p))
     }
     isInside(p) {
-        let points = this.getShape()
-        let lines = []
-        points.push(points[0])
-        for (let i = 0; i < points.length - 1; i++) {
-            lines.push([points[i], points[i + 1]])
-        }
-        let sides = lines.map(([a, b]) => {
-            return b.subtract(a).cross(p.subtract(a)) > 0
-        })
-        let inside = sides.every((b)=> b===sides[0])
+        // let points = this.getShape()
+        // let lines = []
+        // points.push(points[0])
+        // for (let i = 0; i < points.length - 1; i++) {
+        //     lines.push([points[i], points[i + 1]])
+        // }
+        // let sides = lines.map(([a, b]) => {
+        //     return b.subtract(a).cross(p.subtract(a)) > 0
+        // })
+        // let inside = sides.every((b)=> b===sides[0])
         
-        return inside
+        // return inside
 
-        //let r = this.baseShape[0].mag()
-        //let p2 = p.subtract(this.s).mag()
-        //console.log(r, p2)
-        //return p2<r
+        // //let r = this.baseShape[0].mag()
+        // //let p2 = p.subtract(this.s).mag()
+        // //console.log(r, p2)
+        // //return p2<r
+
+        const triangles = this.getTriangles()
+        return !triangles.every(t => !t.isInside(p)) 
+
     }
     receiveImpulse(j) {
         this.v = this.v.add(j.scale(1/this.mass))
