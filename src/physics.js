@@ -5,9 +5,9 @@ const bulletShape = [new Vec(0, -20), new Vec(-5, 20), new Vec(5, 20)]
 const asteroidShape = [new Vec(0, -50), new Vec(50, -20), new Vec(50, 20), new Vec(0, 50), new Vec(-50, 20), new Vec(-50, -20)]
 let objects = [
     new SpaceObject(new Vec(250, 250), new Vec(0, 0), triangleShape),
-    new SpaceObject(new Vec(450, 50), new Vec(0, 0), makeAsteroidShape(50, 4)),
-    new SpaceObject(new Vec(50, 20), new Vec(0, 0), makeAsteroidShape(50, 6)),
-    new SpaceObject(new Vec(350, 60), new Vec(0, 0), makeAsteroidShape(50, 10, 0.6, 0.2))
+    new SpaceObject(new Vec(450, 50), new Vec(0, 0), makeAsteroidShape(10, 6)),
+    new SpaceObject(new Vec(50, 20), new Vec(0, 0), makeAsteroidShape(20, 5)),
+    new SpaceObject(new Vec(350, 60), new Vec(0, 0), makeAsteroidShape(50, 10))
 ]
 let lastTime = 0
 let keyLog = {}
@@ -20,10 +20,8 @@ draw()
 
 //console.log(objects[0].isInside(new Vec(240, 240)), objects[0].isInside(new Vec(30, 30)))
 //console.log(a.subtract(new Vec(2, 2)))
-
+//console.log(new Vec(100, 100).mid(new Vec(200, 200)))
 //console.log(a.mag())
-
-
 
 function keyListener(e) {
     objects[0].accelerate(e.key)
@@ -90,8 +88,6 @@ function drawArrowRel(a, da) {
 }
 
 function update(t) {
-    let vec = new Vec(0,0)
-    // console.log(objects[0].convertLocalToGlobal(vec), objects[0].convertLocalToGlobal(vec) );
     let dt = (t - lastTime) / 50
     objects.forEach((o) => o.checkBounds(500, 500))
     objects.forEach((o) => o.update(dt))
@@ -120,14 +116,14 @@ function update(t) {
 }
 requestAnimationFrame(update)
 
-function makeAsteroidShape(size, points, mult = 0.4, add = 0.8) {
+function makeAsteroidShape(size, points) {
     let angle = 0
     let p1 = new Vec(0, -size)
     let coords = [p1]
     for (let i = 1; i < points; i++) {
         angle = ((Math.PI * 2) / points) * i
         //console.log(angle)
-        coords.push(p1.rotate(angle).scale(Math.random() * mult + add ))
+        coords.push(p1.rotate(angle).scale(Math.random() * 0.4 + 0.8))
         //console.log(coords)
     }
     return coords
