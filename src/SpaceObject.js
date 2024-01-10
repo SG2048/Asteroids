@@ -7,8 +7,16 @@ class SpaceObject {
         this.omega = 0.05
         this.ttl = ttl
         this.cooldown = 0
-        this.mass = 10
+        this.mass = this.getMass() /100
+        this.recentre()
     }
+
+    recentre(){
+        let com = this.getLocalCOM()
+        this.s = this.s.add(com)
+        this.baseShape = this.baseShape.map(c => c.subtract(com))
+    }
+
     update(dt) {
         this.ttl -= dt
         this.cooldown -= dt
@@ -51,11 +59,19 @@ class SpaceObject {
     getPointPairs () {
         return this.getShape().map((v, i, a) => [a.at(i-1), a.at(i)])
       }
+
+    getLocalPointPairs() {
+        return this.baseShape.map((v, i, a) => [a.at(i-1), a.at(i)])
+    }
     
       getTriangles () {
         return this.getPointPairs().map(v => new Triangle(v[0], v[1], this.s))
         // return this.getPointPairs().map(v => [v[0], v[1], this.s])
       }
+
+    getLocalTriangles () {
+        return this.getLocalPointPairs().map(v => new Triangle(v[0], v[1], this.s))
+    }
 
     facing() {
         return new Vec(0, -1).rotate(this.theta)
@@ -88,5 +104,18 @@ class SpaceObject {
     }
     receiveImpulse(j) {
         this.v = this.v.add(j.scale(1/this.mass))
+    }
+
+    getMass(){
+        let triangles = this.getTriangles()
+        let mass = triangles.reduce((p, c, i, a) => p + c.area(), 0)
+        return mass
+    }
+
+    getLocalCOM(){
+        let triangles = this.getLocalTriangles()
+        let mass = triangles.reduce((p, c, i, a) => p + c.area(), 0)
+        let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midpoint().scale(c.area())), new Vec(0,0))
+        return weightedVec.scale(1/mass)
     }
 }

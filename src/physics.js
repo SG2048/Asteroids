@@ -1,6 +1,6 @@
 let canvas = document.getElementById("simulationWindow")
 console.log("hi", canvas)
-const triangleShape = [new Vec(0, -50), new Vec(-50, 50), new Vec(50, 50)]
+const triangleShape = [new Vec(0, -10), new Vec(50, 90), new Vec(-50, 90)]
 const bulletShape = [new Vec(0, -20), new Vec(-5, 20), new Vec(5, 20)]
 const asteroidShape = [new Vec(0, -50), new Vec(50, -20), new Vec(50, 20), new Vec(0, 50), new Vec(-50, 20), new Vec(-50, -20)]
 let objects = [
@@ -9,9 +9,14 @@ let objects = [
     new SpaceObject(new Vec(50, 20), new Vec(0, 0), makeAsteroidShape(20, 5)),
     new SpaceObject(new Vec(350, 60), new Vec(0, 0), makeAsteroidShape(50, 10))
 ]
+// objects.forEach(v => console.log(v.getCOM()))
 let lastTime = 0
 let keyLog = {}
 //document.addEventListener("keydown", keyListener)
+document.addEventListener("keydown", (e) => { if(e.key === "s")
+ objects.forEach(v => console.log(v.getLocalCOM()))
+ console.log(" ") 
+})
 document.addEventListener("keydown", (e) => { keyLog[e.key] = true })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
 let ctx = canvas.getContext("2d")
@@ -19,7 +24,7 @@ console.log("hello", ctx)
 draw()
 
 //console.log(objects[0].isInside(new Vec(240, 240)), objects[0].isInside(new Vec(30, 30)))
-//console.log(a.subtract(new Vec(2, 2)))
+//console.log(a.subtract(new Vec(2, 2)))s
 //console.log(new Vec(100, 100).mid(new Vec(200, 200)))
 //console.log(a.mag())
 
