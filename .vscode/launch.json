@@ -6,6 +6,7 @@
     "configurations": [
 
 
+
         {
             "name": "Launch Desktop location Chrome",
             "request": "launch",
@@ -26,6 +27,15 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}"
-        }
+        },
+        {
+            "name": "College Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "C:\\Users\\ptorrington\\Coding Noah\\repos\\Asteroids\\src\\simulation.html",
+            "webRoot": "${workspaceFolder}"
+        },
+
+   
     ]
 }

@@ -70,7 +70,7 @@ class SpaceObject {
       }
 
     getLocalTriangles () {
-        return this.getLocalPointPairs().map(v => new Triangle(v[0], v[1], this.s))
+        return this.getLocalPointPairs().map(v => new Triangle(v[0], v[1]))
     }
 
     facing() {
