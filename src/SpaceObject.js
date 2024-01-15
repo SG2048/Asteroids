@@ -7,21 +7,17 @@ class SpaceObject {
         this.omega = 0.05
         this.ttl = ttl
         this.cooldown = 0
-        this.mass = this.getMass() / 100
-        this.recentre()
+        this.mass = 10
+        this.reCenter()
     }
-
-    recentre() {
-        let com = this.getLocalCOM()
-        this.s = this.s.add(com)
-        this.baseShape = this.baseShape.map(c => c.subtract(com))
-    }
-
     update(dt) {
         this.ttl -= dt
         this.cooldown -= dt
+        //console.log(this.ttl)
         this.s = this.s.add(this.v.scale(dt))
         this.v = this.v.scale(0.995)
+        //this.theta+=this.omega*dt
+
     }
     checkBounds(bx, by) {
         const x = this.s.x
@@ -31,6 +27,7 @@ class SpaceObject {
         this.s = new Vec(xx, yy)
     }
     accelerate(keys) {
+        //this.v = this.v.add(a) 
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing().scale(0.35))
         if (keys["ArrowDown"]) this.v = this.v.add(this.facing().scale(-1).scale(0.35))
         if (keys["ArrowRight"]) this.theta += this.omega
@@ -42,32 +39,8 @@ class SpaceObject {
         }
     }
     getShape() {
-        return this.baseShape.map((p) => this.convertGlobalToLocal(p))
+        return this.baseShape.map((p) => p.rotate(this.theta).add(this.s))
     }
-
-    convertGlobalToLocal(p) {
-        return p.rotate(this.theta).add(this.s)
-    }
-    convertLocalToGlobal(p) {
-        return p.subtract(this.s).rotate(-this.theta)
-    }
-
-    getPointPairs() {
-        return this.getShape().map((v, i, a) => [a.at(i - 1), a.at(i)])
-    }
-
-    getLocalPointPairs() {
-        return this.baseShape.map((v, i, a) => [a.at(i - 1), a.at(i)])
-    }
-
-    getTriangles() {
-        return this.getPointPairs().map(v => new Triangle(v[0], v[1], this.s))
-    }
-
-    getLocalTriangles() {
-        return this.getLocalPointPairs().map(v => new Triangle(v[0], v[1]))
-    }
-
     facing() {
         return new Vec(0, -1).rotate(this.theta)
     }
@@ -75,24 +48,55 @@ class SpaceObject {
         return !a.every(p => !this.isInside(p))
     }
     isInside(p) {
-        const triangles = this.getTriangles()
+        //let points = this.getShape()
+        //let lines = []
+        // points.push(points[0])
+        // for (let i = 0; i < points.length - 1; i++) {
+        //     lines.push([points[i], points[i + 1]])
+        // }
+        // let sides = lines.map(([a, b]) => {
+        //     return b.subtract(a).cross(p.subtract(a)) > 0
+        // })
+        // let inside = sides.every((b)=> b===sides[0])
+
+        //return inside
+
+        //let r = this.baseShape[0].mag()
+        //let p2 = p.subtract(this.s).mag()
+        //console.log(r, p2)
+        //return p2<r
+        let triangles = this.getTriangles()
         return !triangles.every(t => !t.isInside(p))
 
+    }
+    getPointPairs() {
+        return this.getShape().map((v, i, a) => [a.at(i - 1), a.at(i)])
+    }
+    getTriangles() {
+        return this.getPointPairs().map((v, i, a) => new Triangle(v[0], v[1], this.s))
+    }
+    getLocalPointPairs() {
+        return this.baseShape.map((v, i, a) => [a.at(i - 1), a.at(i)])
+    }
+    getLocalTriangles() {
+        return this.getLocalPointPairs().map((v, i, a) => new Triangle(v[0], v[1]))
     }
     receiveImpulse(j) {
         this.v = this.v.add(j.scale(1 / this.mass))
     }
-
     getMass() {
-        let triangles = this.getTriangles()
-        let mass = triangles.reduce((p, c, i, a) => p + c.area, 0)
-        return mass
-    }
-
-    getLocalCOM() {
         let triangles = this.getLocalTriangles()
-        let mass = triangles.reduce((p, c, i, a) => p + c.area, 0)
-        let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midpoint.scale(c.area)), new Vec(0, 0))
-        return weightedVec.scale(1 / mass)
+        return triangles.reduce((p, c, i, a) => p + c.area, 0)
     }
+    getCenterOfMass() {
+       let triangles = this.getLocalTriangles()
+       let mass = this.getMass()
+       let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midPoint.scale(c.area)), new Vec(0, 0))
+       return weightedVec.scale(1/mass)
+    }
+    reCenter() {
+        const com = this.getCenterOfMass()
+        this.s = this.s.add(com)
+        this.baseShape = this.baseShape.map((c) => c.subtract(com))
+    } 
 }
