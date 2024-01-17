@@ -14,7 +14,7 @@ class SpaceObject {
         this.ttl -= dt
         this.cooldown -= dt
         this.s = this.s.add(this.v.scale(dt))
-        this.v = this.v.scale(0.995)
+        //this.v = this.v.scale(0.995)
         //this.theta+=this.omega*dt
     }
     checkBounds(bx, by) {
@@ -55,7 +55,7 @@ class SpaceObject {
         return arrayPairs(this.baseShape).map((v, i, a) => new Triangle(v[0], v[1]))
     }
     receiveImpulse(j) {
-        this.v = this.v.add(j.scale(100 / this.mass))
+        this.v = this.v.add(j.scale(1/ this.mass))
     }
     get mass() {
         let triangles = this.localTriangles
@@ -81,4 +81,5 @@ class SpaceObject {
         }
         return coords
     }
+
 }
