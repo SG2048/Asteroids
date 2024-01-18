@@ -1,10 +1,20 @@
 let canvas = document.getElementById("simulationWindow")
 let objects = [
     new SpaceObject(new Vec(250, 250), new Vec(0, 0), Triangle.makeTriangle(50,20)),
-    new SpaceObject(new Vec(450, 50), new Vec(0, 0), SpaceObject.makeAsteroidShape(10, 6)),
-    new SpaceObject(new Vec(50, 20), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 5)),
-    new SpaceObject(new Vec(350, 60), new Vec(0, 0), SpaceObject.makeAsteroidShape(50, 10))
+    // new SpaceObject(new Vec(450, 50), new Vec(0, 0), SpaceObject.makeAsteroidShape(10, 6)),
+    // new SpaceObject(new Vec(50, 20), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 5)),
+    // new SpaceObject(new Vec(350, 60), new Vec(0, 0), SpaceObject.makeAsteroidShape(50, 10))
 ]
+
+let r = (n) => Math.rand(n)
+let grid = [50,100,150,200]
+for(n of grid){
+    for (m of grid){
+        console.log(n, m);
+        objects.push(new SpaceObject(new Vec(n, m), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 10)))
+    }
+
+}
 
 // objects.forEach((v) => console.log(v.getCenterOfMass()))
 
@@ -81,7 +91,7 @@ function collide(o, oo){
     // oo.v = frameOfRef
 
 
-    let impulse2 = frameOfRef.subtract(oo.v).scale(oo.mass*1.9)
+    let impulse2 = frameOfRef.subtract(oo.v).scale(oo.mass*4)
 
     if (impulse.unit().dot(collisionDirection) > 0){
         o.receiveImpulse(impulse)
