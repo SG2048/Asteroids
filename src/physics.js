@@ -1,22 +1,25 @@
 let canvas = document.getElementById("simulationWindow")
-const triangleShape = [new Vec(0, -10), new Vec(50, 90), new Vec(-50, 90)]
-const bulletShape = [new Vec(0, -20), new Vec(-5, 20), new Vec(5, 20)]
-const asteroidShape = [new Vec(0, -50), new Vec(50, -20), new Vec(50, 20), new Vec(0, 50), new Vec(-50, 20), new Vec(-50, -20)]
 let objects = [
-    new SpaceObject(new Vec(250, 250), new Vec(0, 0), triangleShape),
-    new SpaceObject(new Vec(450, 50), new Vec(0, 0), makeAsteroidShape(10, 6)),
-    new SpaceObject(new Vec(50, 20), new Vec(0, 0), makeAsteroidShape(20, 5)),
-    new SpaceObject(new Vec(350, 60), new Vec(0, 0), makeAsteroidShape(50, 10))
+    new SpaceObject(new Vec(250, 250), new Vec(0, 0), Triangle.makeTriangle(50,20)),
+    // new SpaceObject(new Vec(450, 50), new Vec(0, 0), SpaceObject.makeAsteroidShape(10, 6)),
+    // new SpaceObject(new Vec(50, 20), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 5)),
+    // new SpaceObject(new Vec(350, 60), new Vec(0, 0), SpaceObject.makeAsteroidShape(50, 10))
 ]
+
+let r = (n) => Math.rand(n)
+let grid = [50,100,150,200]
+for(n of grid){
+    for (m of grid){
+        console.log(n, m);
+        objects.push(new SpaceObject(new Vec(n, m), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 10)))
+    }
+
+}
+
+// objects.forEach((v) => console.log(v.getCenterOfMass()))
 
 let lastTime = 0
 let keyLog = {}
-
-document.addEventListener("keydown", (e) => { if(e.key === "s")
- objects.forEach(v => console.log(v.getLocalCOM()))
- console.log(" ") 
-})
-
 document.addEventListener("keydown", (e) => { keyLog[e.key] = true })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
 let ctx = canvas.getContext("2d")
@@ -35,25 +38,25 @@ function draw() {
 
     function drawShape(s) {
         ctx.moveTo(s[0].x, s[0].y)
-        s.forEach((p) =>  ctx.lineTo(p.x, p.y))
+        s.forEach((p) => {
+             return ctx.lineTo(p.x, p.y)
+         })
         ctx.closePath()
         ctx.stroke()
     }
-
-    objects.forEach((o) => drawShape(o.getShape()))
+    objects.forEach((o) => drawShape(o.shape))
     objects.forEach((o, i) => {
         drawArrowRel(o.s, o.v.scale(20))
-        //drawArrowRel(new Vec(100, 100), o.v.scale(5))
-        //drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
     }
     )
-    drawArrowRel(new Vec(100, 300), objects.map((o) => o.v).reduce((p, c) => p.add(c)).scale(5))
+    drawArrowRel(new Vec(300, 300), objects.map((o) => o.v.scale(o.mass)).reduce((p, c) => p.add(c)).scale(1/100))
     let vectorStart = new Vec(300, 300)
-    objects.map((o) => o.v.scale(20)).forEach((v) => {
-    drawArrowRel(vectorStart, v)
-    vectorStart = vectorStart.add(v)
-    }
-    )
+    ctx.strokeStyle = "grey"
+    objects.map((o) => o.v.scale(o.mass/100)).forEach((v) => {
+        drawArrowRel(vectorStart, v)
+        vectorStart = vectorStart.add(v)
+    })
+    ctx.strokeStyle = "black"
 }
 
 function drawLineAbs(x1, y1, x2, y2) {
@@ -77,6 +80,31 @@ function drawArrowRel(a, da) {
     drawLineRel(end.x, end.y, side2.x, side2.y)
 }
 
+function collide(o, oo){
+    let collisionDirection = (o.s.subtract(oo.s)).unit()
+    let mo = o.v.scale(o.mass)
+    let moo = oo.v.scale(oo.mass)
+    let frameOfRef = (o.v.scale(o.mass).add(oo.v.scale(oo.mass))).scale(1 / (o.mass + oo.mass))
+
+    let impulse = frameOfRef.subtract(o.v).scale(o.mass*1.9)
+    // o.v = frameOfRef
+    // oo.v = frameOfRef
+
+
+    let impulse2 = frameOfRef.subtract(oo.v).scale(oo.mass*4)
+
+    if (impulse.unit().dot(collisionDirection) > 0){
+        o.receiveImpulse(impulse)
+        oo.receiveImpulse(impulse.scale(-1))
+        console.log(o.v, o.mass, oo.v, oo.mass, frameOfRef);
+        console.log(impulse, impulse2);
+        console.log(frameOfRef, mo.add(moo));
+    }   
+
+    // o.receiveImpulse(collisionDirection.scale(impulse))
+    // oo.receiveImpulse(collisionDirection.scale(impulse).scale(-1))
+}
+
 function update(t) {
     let dt = (t - lastTime) / 50
     objects.forEach((o) => o.checkBounds(500, 500))
@@ -87,14 +115,9 @@ function update(t) {
     )
     objects.forEach((o, i) => {
         objects.forEach((oo, ii) => {
-            if (o.isOneInside(oo.getShape()) && o != oo) {
-                let collisionDirection = (o.s.subtract(oo.s)).unit()
-                o.receiveImpulse(collisionDirection.scale(10))
-                oo.receiveImpulse(collisionDirection.scale(10).scale(-1))
-            }
+            if (o.isOneInside(oo.shape) && o != oo) { collide(o, oo) }
         })
     })
-
     objects[0].accelerate(keyLog)
     draw()
     lastTime = t
@@ -102,15 +125,5 @@ function update(t) {
 }
 requestAnimationFrame(update)
 
-function makeAsteroidShape(size, points) {
-    let angle = 0
-    let p1 = new Vec(0, -size)
-    let coords = [p1]
-    for (let i = 1; i < points; i++) {
-        angle = ((Math.PI * 2) / points) * i
-        coords.push(p1.rotate(angle).scale(Math.random() * 0.6 + 0.2))
-    }
-    return coords
-}
 
 

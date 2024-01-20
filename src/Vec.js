@@ -27,11 +27,11 @@ class Vec {
     cross(a) {
         return (this.x * a.y) - (a.x * this.y)
     }
+    dot (b) { return this.x * b.x + this.y * b.y }
     unit() {
         return this.scale(1 / this.mag())
     }
     theta() {
-        //return Math.atan(this.x/this.y)
         return (Math.atan2(this.y, this.x) + (2 * Math.PI)) % (2 * Math.PI)
     }
     cCoords() {
