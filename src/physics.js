@@ -10,13 +10,13 @@ let r = (n) => Math.rand(n)
 let grid = [50,100,150,200]
 for(n of grid){
     for (m of grid){
-        console.log(n, m);
+        // console.log(n, m);
         objects.push(new SpaceObject(new Vec(n, m), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 10)))
     }
 
 }
 
-// objects.forEach((v) => console.log(v.getCenterOfMass()))
+ objects.forEach((v) => console.log(v.momentOfInertia))
 
 let lastTime = 0
 let keyLog = {}
@@ -80,7 +80,7 @@ function drawArrowRel(a, da) {
     drawLineRel(end.x, end.y, side2.x, side2.y)
 }
 
-function collide(o, oo){
+function collide(o, oo, p){
     let collisionDirection = (o.s.subtract(oo.s)).unit()
     let mo = o.v.scale(o.mass)
     let moo = oo.v.scale(oo.mass)
@@ -90,15 +90,15 @@ function collide(o, oo){
     // o.v = frameOfRef
     // oo.v = frameOfRef
 
-
+    // console.log(p);
     let impulse2 = frameOfRef.subtract(oo.v).scale(oo.mass*4)
 
     if (impulse.unit().dot(collisionDirection) > 0){
-        o.receiveImpulse(impulse)
-        oo.receiveImpulse(impulse.scale(-1))
-        console.log(o.v, o.mass, oo.v, oo.mass, frameOfRef);
-        console.log(impulse, impulse2);
-        console.log(frameOfRef, mo.add(moo));
+        o.receiveImpulse(impulse, p)
+        oo.receiveImpulse(impulse.scale(-1), p)
+        // console.log(o.v, o.mass, oo.v, oo.mass, frameOfRef);
+        // console.log(impulse, impulse2);
+        // console.log(frameOfRef, mo.add(moo));
     }   
 
     // o.receiveImpulse(collisionDirection.scale(impulse))
@@ -115,7 +115,13 @@ function update(t) {
     )
     objects.forEach((o, i) => {
         objects.forEach((oo, ii) => {
-            if (o.isOneInside(oo.shape) && o != oo) { collide(o, oo) }
+            if (o != oo){
+                if (o.isOneInside(oo.shape) ) { 
+                    collide(o, oo, o.whichOneIsInside(oo.shape))
+                    // o.whichOneIsInside(oo.shape)
+                 }
+            }
+
         })
     })
     objects[0].accelerate(keyLog)

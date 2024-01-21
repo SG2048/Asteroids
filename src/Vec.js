@@ -15,7 +15,7 @@ class Vec {
     subtract(s) {
         return new Vec(this.x - s.x, this.y - s.y)
     }
-    mag(m) {
+    mag() {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
     scale(s) {

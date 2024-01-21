@@ -4,7 +4,7 @@ class SpaceObject {
         this.v = v
         this.baseShape = baseShape
         this.theta = theta
-        this.omega = 0.05
+        this.omega = 0.0
         this.ttl = ttl
         this.cooldown = 0
         // this.mass = 10
@@ -15,7 +15,7 @@ class SpaceObject {
         this.cooldown -= dt
         this.s = this.s.add(this.v.scale(dt))
         //this.v = this.v.scale(0.995)
-        //this.theta+=this.omega*dt
+        this.theta+=this.omega*dt
     }
     checkBounds(bx, by) {
         const x = this.s.x
@@ -27,8 +27,8 @@ class SpaceObject {
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
         if (keys["ArrowDown"]) this.v = this.v.add(this.facing.scale(-1).scale(0.35))
-        if (keys["ArrowRight"]) this.theta += this.omega
-        if (keys["ArrowLeft"]) this.theta -= this.omega
+        if (keys["ArrowRight"]) this.theta += 0.05, this.omega = 0
+        if (keys["ArrowLeft"]) this.theta -= 0.05, this.omega = 0
         if (keys[" "] && this.cooldown < 0) {
             this.cooldown = 10
             objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(5).add(this.v), Triangle.makeTriangle(20,10), this.theta, 100))
@@ -44,6 +44,10 @@ class SpaceObject {
     isOneInside(a) {
         return !a.every(p => !this.isInside(p))
     }
+    whichOneIsInside(a){
+        return a.filter(p => this.isInside(p))[0]
+
+    }
     isInside(p) {
         let triangles = this.triangles
         return !triangles.every(t => !t.isInside(p))
@@ -54,8 +58,10 @@ class SpaceObject {
     get localTriangles() {
         return arrayPairs(this.baseShape).map((v, i, a) => new Triangle(v[0], v[1]))
     }
-    receiveImpulse(j) {
+    receiveImpulse(j, loc = this.s) {
+        console.log(loc);
         this.v = this.v.add(j.scale(1/ this.mass))
+        this.omega = j.cross(loc.subtract(this.s))/(-this.momentOfInertia*100)
     }
     get mass() {
         let triangles = this.localTriangles
@@ -65,6 +71,10 @@ class SpaceObject {
        let triangles = this.localTriangles
        let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midPoint.scale(c.area)), new Vec(0, 0))
        return weightedVec.scale(1 / this.mass)
+    }
+    get momentOfInertia(){
+        let triangles = this.localTriangles
+        return triangles.reduce((p, c) => c.momentOfInertia + p, 0)
     }
     reCenter() {
         const com = this.centerOfMass

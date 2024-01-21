@@ -20,7 +20,12 @@ class Triangle {
     const [aa, bb, cc] = this.vertices
     return Math.abs(0.5 * (aa.x * (bb.y - cc.y) + bb.x * (cc.y - aa.y) + cc.x * (aa.y - bb.y)))
   }
+  get momentOfInertia() {
+    const [aa, bb, cc] = this.vertices
+    return this.area*(aa.subtract(cc).mag()^2 + bb.subtract(cc).mag()^2) / 4
+  }
   static makeTriangle(length = 100, width = 50){
     return [new Vec(0, -length), new Vec(-width/2, 0), new Vec(width/2, 0)]
   }
+  
 }
