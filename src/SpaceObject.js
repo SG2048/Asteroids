@@ -18,11 +18,19 @@ class SpaceObject {
         this.theta+=this.omega*dt
     }
     checkBounds(bx, by) {
-        const x = this.s.x
-        const xx = (x + bx) % bx
-        const y = this.s.y
-        const yy = (y + by) % by
-        this.s = new Vec(xx, yy)
+        // const x = this.s.x
+        // const xx = (x + bx) % bx
+        // const y = this.s.y
+        // const yy = (y + by) % by
+        // this.s = new Vec(xx, yy)
+
+        if (this.s.x > bx) this.v = new Vec(Math.min(0, this.v.x), this.v.y)
+        if (this.s.y > by) this.v = new Vec(this.v.x, Math.min(0, this.v.y))
+
+        if (this.s.x < 0) this.v = new Vec(Math.max(0, this.v.x), this.v.y)
+        if (this.s.y < 0) this.v = new Vec(this.v.x, Math.max(0, this.v.y))
+
+
     }
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
@@ -62,6 +70,10 @@ class SpaceObject {
         console.log(loc);
         this.v = this.v.add(j.scale(1/ this.mass))
         this.omega = j.cross(loc.subtract(this.s))/(-this.momentOfInertia*100)
+    }
+    applyGravity(loc, mass){
+       
+        this.v = this.v.add(loc.subtract(this.s).unit().scale(mass * G))
     }
     get mass() {
         let triangles = this.localTriangles

@@ -5,13 +5,14 @@ let objects = [
     // new SpaceObject(new Vec(50, 20), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 5)),
     // new SpaceObject(new Vec(350, 60), new Vec(0, 0), SpaceObject.makeAsteroidShape(50, 10))
 ]
+const G = 0.001
 
 let r = (n) => Math.rand(n)
 let grid = [50,100,150,200]
 for(n of grid){
     for (m of grid){
         // console.log(n, m);
-        objects.push(new SpaceObject(new Vec(n, m), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 10)))
+        objects.push(new SpaceObject(new Vec(n, m), new Vec(0, 3), SpaceObject.makeAsteroidShape(20, 10)))
     }
 
 }
@@ -111,8 +112,8 @@ function update(t) {
     objects.forEach((o) => o.update(dt))
     objects.forEach((o, i) => {
         if (o.ttl < 0) { objects.splice(i, 1) }
-    }
-    )
+    })
+    objects.forEach((o) => o.applyGravity(new Vec(250,250), 10))
     objects.forEach((o, i) => {
         objects.forEach((oo, ii) => {
             if (o != oo){
