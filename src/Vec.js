@@ -15,7 +15,7 @@ class Vec {
     subtract(s) {
         return new Vec(this.x - s.x, this.y - s.y)
     }
-    mag() {
+    mag(m) {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
     scale(s) {
@@ -27,7 +27,6 @@ class Vec {
     cross(a) {
         return (this.x * a.y) - (a.x * this.y)
     }
-    dot (b) { return this.x * b.x + this.y * b.y }
     unit() {
         return this.scale(1 / this.mag())
     }
@@ -40,5 +39,10 @@ class Vec {
     mid(a) {
         return new Vec((this.x + a.x) / 2, (this.y + a.y) / 2)
     }
-    static add(a, b) { return a.add(b) }
+    dot(a) {
+        return (a.x * this.x + a.y * this.y)
+    }
+    static add(a, b) {
+        return a.add(b)
+    }
 }

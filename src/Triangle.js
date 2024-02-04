@@ -14,7 +14,7 @@ class Triangle {
     return inside
   }
   get midPoint() {
-    return this.vertices.reduce((p, c, i, a) => c.add(p)).scale(1 / this.vertices.length)
+    return this.vertices.reduce(Vec.add).scale(1 / this.vertices.length)
   }
   get area() {
     const [aa, bb, cc] = this.vertices
@@ -22,10 +22,8 @@ class Triangle {
   }
   get momentOfInertia() {
     const [aa, bb, cc] = this.vertices
-    return this.area*(aa.subtract(cc).mag()^2 + bb.subtract(cc).mag()^2) / 4
+    return (this.area*((aa.subtract(cc).mag()^2)+(bb.subtract(cc).mag()^2)))/4
   }
-  static makeTriangle(length = 100, width = 50){
-    return [new Vec(0, -length), new Vec(-width/2, 0), new Vec(width/2, 0)]
-  }
-  
 }
+let t1 = new Triangle(new Vec(0, 5), new Vec(5, 0))
+console.log(t1.area)

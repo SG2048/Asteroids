@@ -4,10 +4,9 @@ class SpaceObject {
         this.v = v
         this.baseShape = baseShape
         this.theta = theta
-        this.omega = 0.0
+        this.omega = 0.00
         this.ttl = ttl
         this.cooldown = 0
-        // this.mass = 10
         this.reCenter()
     }
     update(dt) {
@@ -15,22 +14,15 @@ class SpaceObject {
         this.cooldown -= dt
         this.s = this.s.add(this.v.scale(dt))
         //this.v = this.v.scale(0.995)
-        this.theta+=this.omega*dt
+        this.theta += this.omega * dt
+
     }
     checkBounds(bx, by) {
-        // const x = this.s.x
-        // const xx = (x + bx) % bx
-        // const y = this.s.y
-        // const yy = (y + by) % by
-        // this.s = new Vec(xx, yy)
-
-        if (this.s.x > bx) this.v = new Vec(Math.min(0, this.v.x), this.v.y)
-        if (this.s.y > by) this.v = new Vec(this.v.x, Math.min(0, this.v.y))
-
-        if (this.s.x < 0) this.v = new Vec(Math.max(0, this.v.x), this.v.y)
-        if (this.s.y < 0) this.v = new Vec(this.v.x, Math.max(0, this.v.y))
-
-
+        const x = this.s.x
+        const xx = (x + bx) % bx
+        const y = this.s.y
+        const yy = (y + by) % by
+        this.s = new Vec(xx, yy)
     }
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
@@ -38,8 +30,8 @@ class SpaceObject {
         if (keys["ArrowRight"]) this.theta += 0.05, this.omega = 0
         if (keys["ArrowLeft"]) this.theta -= 0.05, this.omega = 0
         if (keys[" "] && this.cooldown < 0) {
-            this.cooldown = 10
-            objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(5).add(this.v), Triangle.makeTriangle(20,10), this.theta, 100))
+            this.cooldown = 30
+            objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(5).add(this.v), SpaceObject.makeTriangleShape(20, 7), this.theta, 200))
             this.v = this.v.add(this.facing.scale(-0.5))
         }
     }
@@ -52,56 +44,63 @@ class SpaceObject {
     isOneInside(a) {
         return !a.every(p => !this.isInside(p))
     }
-    whichOneIsInside(a){
-        return a.filter(p => this.isInside(p))[0]
-
-    }
     isInside(p) {
         let triangles = this.triangles
         return !triangles.every(t => !t.isInside(p))
+
+    }
+    whichOneIsInside(a) {
+        return a.filter(p => this.isInside(p))[0]
+    }
+    get pointPairs() {
+        return arrayPairs(this.shape)
     }
     get triangles() {
-        return arrayPairs(this.shape).map((v, i, a) => new Triangle(v[0], v[1], this.s))
+        return this.pointPairs.map((v, i, a) => new Triangle(v[0], v[1], this.s))
     }
     get localTriangles() {
         return arrayPairs(this.baseShape).map((v, i, a) => new Triangle(v[0], v[1]))
     }
     receiveImpulse(j, loc = this.s) {
-        console.log(loc);
-        this.v = this.v.add(j.scale(1/ this.mass))
-        this.omega = j.cross(loc.subtract(this.s))/(-this.momentOfInertia*100)
-    }
-    applyGravity(loc, mass){
-       
-        this.v = this.v.add(loc.subtract(this.s).unit().scale(mass * G))
+        this.v = this.v.add(j.scale(1 / this.mass))
+        this.omega = loc.subtract(this.s).cross(j) / (this.momentOfInertia*100)
     }
     get mass() {
         let triangles = this.localTriangles
         return triangles.reduce((p, c, i, a) => p + c.area, 0)
     }
     get centerOfMass() {
-       let triangles = this.localTriangles
-       let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midPoint.scale(c.area)), new Vec(0, 0))
-       return weightedVec.scale(1 / this.mass)
-    }
-    get momentOfInertia(){
         let triangles = this.localTriangles
-        return triangles.reduce((p, c) => c.momentOfInertia + p, 0)
+        let weightedVec = triangles.reduce((p, c, i, a) => p.add(c.midPoint.scale(c.area)), new Vec(0, 0))
+        return weightedVec.scale(1 / this.mass)
     }
     reCenter() {
         const com = this.centerOfMass
         this.s = this.s.add(com)
         this.baseShape = this.baseShape.map((c) => c.subtract(com))
-    } 
+    }
+    get momentOfInertia() {
+        let triangles = this.localTriangles
+        //triangles.forEach((c) => console.log(c.momentOfInertia))
+        return triangles.reduce((p,c,i,a) => c.momentOfInertia + p, 0)
+    }
+    applyGravity(loc, mass) {
+        const r = this.s.subtract(loc).unit()
+        this.v = this.v.add(r.scale(-mass))
+    }
     static makeAsteroidShape(size, points) {
         let angle = 0
         let p1 = new Vec(0, -size)
         let coords = [p1]
         for (let i = 1; i < points; i++) {
             angle = ((Math.PI * 2) / points) * i
+            //console.log(angle)
             coords.push(p1.rotate(angle).scale(Math.random() * 0.8 + 0.2))
+            //console.log(coords)
         }
         return coords
     }
-
+    static makeTriangleShape(length, width) {
+        return [new Vec(0, -length), new Vec(-width / 2, 0), new Vec(width / 2, 0)]
+    }
 }
