@@ -42,6 +42,14 @@ class Vec {
     dot(a) {
         return (a.x * this.x + a.y * this.y)
     }
+    limit(l){
+        return this.copy()
+        if (this.mag() < l) return this.copy()
+        else return this.copy().scale(this.mag() / l)
+    }
+    copy(){
+        return new Vec(this.x, this.y)
+    }
     static add(a, b) {
         return a.add(b)
     }

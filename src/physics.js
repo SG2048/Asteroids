@@ -5,10 +5,11 @@ let objects = [
     // new SpaceObject(new Vec(50, 20), new Vec(0, 0), SpaceObject.makeAsteroidShape(20, 5)),
     // new SpaceObject(new Vec(350, 60), new Vec(0, 0), SpaceObject.makeAsteroidShape(50, 10))
 ]
+let gravityObjects = [{mass:0.1, s: new Vec (250,250)}]
 let grid = [100, 200, 300]
 for (const n of grid) {
     for(const m of grid) {
-        objects.push(new SpaceObject(new Vec(m, n), new Vec(0, 0), SpaceObject.makeAsteroidShape(30, 10)))
+        objects.push(new SpaceObject(new Vec(m, n), new Vec(1, 1), SpaceObject.makeAsteroidShape(30, 10)))
     }
 }
 //objects.forEach((v) => console.log(v.centerOfMass))
@@ -19,6 +20,9 @@ document.addEventListener("keydown", (e) => {
     keyLog[e.key] = true 
     if(e.key==="p") {
         console.log(objects[0].momentOfInertia)
+    }
+    if(e.key==="o") {
+        objects.forEach(o => o.putInOrbit(gravityObjects[0]))
     }
 })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
@@ -56,7 +60,11 @@ function draw() {
     //drawShape(triangleShape)
     objects.forEach((o) => drawShape(o.shape))
     objects.forEach((o, i) => {
+        ctx.strokeStyle = "blue"
         drawArrowRel(o.s, o.v.scale(20))
+        ctx.strokeStyle = "red"
+        drawArrowRel(o.s, o.calculateGravity(gravityObjects[0]).scale(50000))
+        ctx.strokeStyle = "black"
         //drawArrowRel(new Vec(100, 100), o.v.scale(5))
         //drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
     }
@@ -64,11 +72,11 @@ function draw() {
     drawArrowRel(new Vec(300, 300), objects.map((o) => o.v.scale(o.mass)).reduce(Vec.add).scale(1/100))
     let vectorStart = new Vec(300, 300)
     ctx.strokeStyle = "blue"
-    objects.map((o) => o.v.scale(o.mass/100)).forEach((v) => {
-        drawArrowRel(vectorStart, v)
-        vectorStart = vectorStart.add(v)
-    }
-   )
+    // objects.map((o) => o.v.scale(o.mass/100)).forEach((v) => {
+    //     drawArrowRel(vectorStart, v)
+    //     vectorStart = vectorStart.add(v)
+    // })
+
    ctx.strokeStyle = "black"
 }
 
@@ -113,8 +121,8 @@ function update(t) {
     //objects.forEach((o) => o.update(dt))
     objects.forEach((o, i) => {
         o.update(dt)
-        o.checkBounds(500, 500)
-        o.applyGravity(new Vec(250, 250), 0.01)
+        o.checkBounds(500, 500, "killOut")
+        o.applyGravity(gravityObjects[0])
         if (o.ttl < 0) { objects.splice(i, 1) }
     }
     )

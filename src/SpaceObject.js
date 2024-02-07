@@ -17,12 +17,20 @@ class SpaceObject {
         this.theta += this.omega * dt
 
     }
-    checkBounds(bx, by) {
-        const x = this.s.x
-        const xx = (x + bx) % bx
-        const y = this.s.y
-        const yy = (y + by) % by
-        this.s = new Vec(xx, yy)
+    checkBounds(bx, by, method) {
+        if(method==="wrap"){
+            const x = this.s.x
+            const xx = (x + bx) % bx
+            const y = this.s.y
+            const yy = (y + by) % by
+            this.s = new Vec(xx, yy)  
+        }
+        if(method==="killOut"){
+            if (this.s.x > bx) this.v = new Vec(Math.min(0, this.v.x), this.v.y)
+            if (this.s.y > by) this.v = new Vec(this.v.x, Math.min(0, this.v.y))
+            if (this.s.x < 0) this.v = new Vec(Math.max(0, this.v.x), this.v.y)
+            if (this.s.y < 0) this.v = new Vec(this.v.x, Math.max(0, this.v.y))
+        }
     }
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
@@ -84,9 +92,16 @@ class SpaceObject {
         //triangles.forEach((c) => console.log(c.momentOfInertia))
         return triangles.reduce((p,c,i,a) => c.momentOfInertia + p, 0)
     }
-    applyGravity(loc, mass) {
-        const r = this.s.subtract(loc).unit()
-        this.v = this.v.add(r.scale(-mass))
+    applyGravity(go) {
+        this.v = this.v.add(this.calculateGravity(go))
+    }
+    calculateGravity(go) {
+        const r = this.s.subtract(go.s)
+        return r.unit().scale(-go.mass/((Math.max(r.mag(),5))^2))
+    }
+    putInOrbit(go) {
+        const r = this.s.subtract(go.s)
+        this.v = r.rotate(Math.PI/2).unit().scale(16*Math.sqrt(go.mass/r.mag()))              
     }
     static makeAsteroidShape(size, points) {
         let angle = 0
