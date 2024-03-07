@@ -8,10 +8,17 @@
 
 
         {
-            "name": "Launch Desktop location Chrome",
+            "name": "Launch Chrome Paul",
             "request": "launch",
             "type": "chrome",
             "url": "C:\\Users\\paul_\\Documents\\GitHub\\Asteroids\\src\\simulation.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+        "name": "Launch Chrome Noah",
+            "request": "launch",
+            "type": "chrome",
+            "url": "C:\\Users\\dnlry\\OneDrive\\Documents\\Github\\Asteroids\\src\\simulation.html",
             "webRoot": "${workspaceFolder}"
         },
         {
