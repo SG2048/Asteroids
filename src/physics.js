@@ -20,7 +20,7 @@ document.addEventListener("keydown", (e) => {
         console.log(objects[0].momentOfInertia)
     }
     if (e.key === "o") {
-        objects.forEach((o) => o.putInOrbit(gravityObjects[0]))
+        objects.forEach((o) => o.v = putInOrbit(gravityObjects[0], o.s))
     }
 })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
@@ -57,7 +57,7 @@ function draw() {
         dl.fillText((ke+pe).toFixed(1), o.s.x-100, o.s.y, "green")
         //dl.drawArrowRel(new Vec(100, 100), o.v.scale(5))
         //ctx.strokeStyle = "red"
-        dl.drawArrowRel(o.s, o.calculateGravity(gravityObjects[0]).scale(2500), "green")
+        dl.drawArrowRel(o.s, calculateGravity(gravityObjects[0], o.s).scale(2500), "green")
         // ctx.strokeStyle = "black"
         dl.drawShape(o.history, true)
         //dl.drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
@@ -112,8 +112,7 @@ function doCollisions(o, oo, p) {
         oo.receiveImpulse(impulse.scale(-1), p)
     }
 }
-function update(t) {
-    let dt = (t - lastTime) / 50 //fix
+function updatePhysics (dt) {
     objects.forEach((o, i) => {
         o.update(dt, calculateGravity(gravityObjects[0], o.s))
         o.checkBounds(500, 500)
@@ -128,12 +127,32 @@ function update(t) {
             }
         })
     })
+}
+function update(t) {
+    let dt = 0.0002 //(t - lastTime) / 50 //fix
+    for(let i = 0; i<250; i++) { updatePhysics(dt) }
+    
+    // objects.forEach((o, i) => {
+    //     o.update(dt, calculateGravity(gravityObjects[0], o.s))
+    //     o.checkBounds(500, 500)
+    //     //o.applyGravity(gravityObjects[0], dt)
+    //     if (o.ttl < 0) { objects.splice(i, 1) }
+    // }
+    // )
+    // objects.forEach((o, i) => {
+    //     objects.forEach((oo, ii) => {
+    //         if (o.isOneInside(oo.shape) && o != oo) {
+    //             doCollisions(o, oo, o.whichOneIsInside(oo.shape))
+    //         }
+    //     })
+    // })
+    // objects[0].accelerate(keyLog)
     objects[0].accelerate(keyLog)
     draw()
     lastTime = t
-    requestAnimationFrame(update)
+    setTimeout(update, 1)
 }
-requestAnimationFrame(update)
+setTimeout(update, 1)
 
 
 
