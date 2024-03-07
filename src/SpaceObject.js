@@ -7,30 +7,40 @@ class SpaceObject {
         this.omega = 0.00
         this.ttl = ttl
         this.cooldown = 0
+        this.history = [this.s]
+        this.historyCooldown = 0
         this.reCenter()
     }
-    update(dt) {
+    update(dt, gg) {
         this.ttl -= dt
         this.cooldown -= dt
         this.s = this.s.add(this.v.scale(dt))
         //this.v = this.v.scale(0.995)
         this.theta += this.omega * dt
-
+        this.v = this.v.add(gg.scale(dt))
+        this.updateHistory()
     }
-    checkBounds(bx, by, method) {
-        if(method==="wrap"){
-            const x = this.s.x
-            const xx = (x + bx) % bx
-            const y = this.s.y
-            const yy = (y + by) % by
-            this.s = new Vec(xx, yy)  
+    updateHistory() {
+        if (this.historyCooldown <= 0) {
+            this.history.push(this.s)
+            this.historyCooldown = 10
+            if (this.history.length > 30) {
+                this.history = this.history.slice(1)
+            }
         }
-        if(method==="killOut"){
-            if (this.s.x > bx) this.v = new Vec(Math.min(0, this.v.x), this.v.y)
-            if (this.s.y > by) this.v = new Vec(this.v.x, Math.min(0, this.v.y))
-            if (this.s.x < 0) this.v = new Vec(Math.max(0, this.v.x), this.v.y)
-            if (this.s.y < 0) this.v = new Vec(this.v.x, Math.max(0, this.v.y))
-        }
+        this.historyCooldown--
+    }
+    checkBounds(bx, by) {
+        // TODO: fix corners
+        // const x = this.s.x
+        // const xx = (x + bx) % bx
+        // const y = this.s.y
+        // const yy = (y + by) % by
+        // this.s = new Vec(xx, yy)
+        if (this.s.x > bx) { this.v = new Vec(Math.min(0, this.v.x), this.v.y) }
+        if (this.s.x < 0) { this.v = new Vec(Math.max(0, this.v.x), this.v.y) }
+        if (this.s.y > by) { this.v = new Vec(this.v.x, Math.min(0, this.v.y)) }
+        if (this.s.y < 0) { this.v = new Vec(this.v.x, Math.max(0, this.v.y)) }
     }
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
@@ -71,7 +81,7 @@ class SpaceObject {
     }
     receiveImpulse(j, loc = this.s) {
         this.v = this.v.add(j.scale(1 / this.mass))
-        this.omega = loc.subtract(this.s).cross(j) / (this.momentOfInertia*100)
+        this.omega = loc.subtract(this.s).cross(j) / (this.momentOfInertia * 100)
     }
     get mass() {
         let triangles = this.localTriangles
@@ -89,19 +99,20 @@ class SpaceObject {
     }
     get momentOfInertia() {
         let triangles = this.localTriangles
-        //triangles.forEach((c) => console.log(c.momentOfInertia))
-        return triangles.reduce((p,c,i,a) => c.momentOfInertia + p, 0)
+        return triangles.reduce((p, c, i, a) => c.momentOfInertia + p, 0)
     }
-    applyGravity(go) {
-        this.v = this.v.add(this.calculateGravity(go))
+    get kineticEnergy() {
+        return 1 / 2 * this.mass * ((this.v).mag ** 2)
     }
-    calculateGravity(go) {
-        const r = this.s.subtract(go.s)
-        return r.unit().scale(-go.mass/((Math.max(r.mag(),5))^2))
+    calculateGravity(g) {
+        return calculateGravity(g, this.s)
     }
-    putInOrbit(go) {
-        const r = this.s.subtract(go.s)
-        this.v = r.rotate(Math.PI/2).unit().scale(16*Math.sqrt(go.mass/r.mag()))              
+    //applyGravity(g, dt) {
+        //this.v = this.v.add(this.calculateGravity(g).scale(dt))
+    //}
+    putInOrbit(g) {
+        const r = this.s.subtract(g.s)
+        this.v = r.rotate(Math.PI / 2).unit.scale(Math.sqrt(g.mass / r.mag))
     }
     static makeAsteroidShape(size, points) {
         let angle = 0
@@ -109,9 +120,7 @@ class SpaceObject {
         let coords = [p1]
         for (let i = 1; i < points; i++) {
             angle = ((Math.PI * 2) / points) * i
-            //console.log(angle)
             coords.push(p1.rotate(angle).scale(Math.random() * 0.8 + 0.2))
-            //console.log(coords)
         }
         return coords
     }
