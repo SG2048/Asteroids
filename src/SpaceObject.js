@@ -80,8 +80,17 @@ class SpaceObject {
         return arrayPairs(this.baseShape).map((v, i, a) => new Triangle(v[0], v[1]))
     }
     receiveImpulse(j, loc = this.s) {
+        //p.rotate(this.theta).add(this.s))
+        const reloc = loc.subtract(this.s).rotate(-this.theta)
         this.v = this.v.add(j.scale(1 / this.mass))
         this.omega = loc.subtract(this.s).cross(j) / (this.momentOfInertia * 100)
+        const closest = this.findClosestPoint(reloc)
+        this.baseShape[closest] = this.baseShape[closest].scale(0.90)
+    }
+    findClosestPoint (reloc) {
+        let angles = this.baseShape.map((c, i) => [i,Math.abs(c.theta-reloc.theta)])
+        console.log(angles)
+        return angles.reduce((p, c) => p[1] < c[1]? p: c)[0]
     }
     get mass() {
         let triangles = this.localTriangles
