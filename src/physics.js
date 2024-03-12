@@ -1,7 +1,7 @@
 //let canvas = document.getElementById("simulationWindow")
 const dl = new DrawLayer(document.getElementById("simulationWindow").getContext("2d"), "white", "black", "white")
 let objects = [
-    new SpaceObject(new Vec(250, 250), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20)),
+    new SpaceObject(new Vec(250, 250), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
 let gravityObjects = [
     { s: new Vec(250, 250), mass: 300 }
@@ -9,7 +9,7 @@ let gravityObjects = [
 let grid = [100]
 for (const n of grid) {
     for (const m of grid) {
-        objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(15, 10)))
+        objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(52, 10), 0, 99999))
     }
 }
 let lastTime = 0
@@ -59,7 +59,7 @@ function draw() {
         //ctx.strokeStyle = "red"
         dl.drawArrowRel(o.s, calculateGravity(gravityObjects[0], o.s).scale(2500), "green")
         // ctx.strokeStyle = "black"
-        dl.drawShape(o.history, true)
+        dl.drawShape(o.history, true, "white")
         //dl.drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
     }
     )
@@ -129,8 +129,9 @@ function updatePhysics (dt) {
     })
 }
 function update(t) {
-    let dt = 0.0002 //(t - lastTime) / 50 //fix
-    for(let i = 0; i<250; i++) { updatePhysics(dt) }
+    let itt = 100
+    let dt = 0.05/itt //(t - lastTime) / 50 //fix
+    for(let i = 0; i<itt; i++) { updatePhysics(dt) }
     
     // objects.forEach((o, i) => {
     //     o.update(dt, calculateGravity(gravityObjects[0], o.s))

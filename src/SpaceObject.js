@@ -1,5 +1,5 @@
 class SpaceObject {
-    constructor(s, v, baseShape, theta = 0, ttl = 999999) {
+    constructor(s, v, baseShape, theta = 0, ttl = 999999, type = "asteroid") {
         this.s = s
         this.v = v
         this.baseShape = baseShape
@@ -9,6 +9,7 @@ class SpaceObject {
         this.cooldown = 0
         this.history = [this.s]
         this.historyCooldown = 0
+        this.type = type
         this.reCenter()
     }
     update(dt, gg) {
@@ -18,9 +19,9 @@ class SpaceObject {
         //this.v = this.v.scale(0.995)
         this.theta += this.omega * dt
         this.v = this.v.add(gg.scale(dt))
-        this.updateHistory()
+        this.updateHistory(dt)
     }
-    updateHistory() {
+    updateHistory(dt) {
         if (this.historyCooldown <= 0) {
             this.history.push(this.s)
             this.historyCooldown = 10
@@ -28,7 +29,7 @@ class SpaceObject {
                 this.history = this.history.slice(1)
             }
         }
-        this.historyCooldown--
+        this.historyCooldown-=dt/0.05
     }
     checkBounds(bx, by) {
         // TODO: fix corners
@@ -37,10 +38,10 @@ class SpaceObject {
         // const y = this.s.y
         // const yy = (y + by) % by
         // this.s = new Vec(xx, yy)
-        if (this.s.x > bx) { this.v = new Vec(Math.min(0, this.v.x), this.v.y) }
-        if (this.s.x < 0) { this.v = new Vec(Math.max(0, this.v.x), this.v.y) }
-        if (this.s.y > by) { this.v = new Vec(this.v.x, Math.min(0, this.v.y)) }
-        if (this.s.y < 0) { this.v = new Vec(this.v.x, Math.max(0, this.v.y)) }
+        if (this.s.x > bx-20) { this.v = new Vec(Math.min(0, this.v.x), this.v.y) }
+        if (this.s.x < 20) { this.v = new Vec(Math.max(0, this.v.x), this.v.y) }
+        if (this.s.y > by-20) { this.v = new Vec(this.v.x, Math.min(0, this.v.y)) }
+        if (this.s.y < 20) { this.v = new Vec(this.v.x, Math.max(0, this.v.y)) }
     }
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
@@ -48,8 +49,8 @@ class SpaceObject {
         if (keys["ArrowRight"]) this.theta += 0.05, this.omega = 0
         if (keys["ArrowLeft"]) this.theta -= 0.05, this.omega = 0
         if (keys[" "] && this.cooldown < 0) {
-            this.cooldown = 30
-            objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(5).add(this.v), SpaceObject.makeTriangleShape(20, 7), this.theta, 200))
+            this.cooldown = 5
+            objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(10).add(this.v), SpaceObject.makeTriangleShape(20, 7), this.theta, 200, "bullet"))
             this.v = this.v.add(this.facing.scale(-0.5))
         }
     }
@@ -85,11 +86,19 @@ class SpaceObject {
         this.v = this.v.add(j.scale(1 / this.mass))
         this.omega = loc.subtract(this.s).cross(j) / (this.momentOfInertia * 100)
         const closest = this.findClosestPoint(reloc)
-        this.baseShape[closest] = this.baseShape[closest].scale(0.90)
+        if(this.type === "ship") {
+            console.log("the ship has been hit")
+        }
+        if(this.type === "bullet") {
+            this.ttl = 0
+        }
+        if(this.type === "asteroid") {
+        this.baseShape[closest] = this.baseShape[closest].subtract(this.baseShape[closest].unit.scale(10))
+    }
     }
     findClosestPoint (reloc) {
         let angles = this.baseShape.map((c, i) => [i,Math.abs(c.theta-reloc.theta)])
-        console.log(angles)
+        //console.log(angles)
         return angles.reduce((p, c) => p[1] < c[1]? p: c)[0]
     }
     get mass() {
