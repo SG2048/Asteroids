@@ -93,7 +93,11 @@ class SpaceObject {
             this.ttl = 0
         }
         if(this.type === "asteroid") {
-        this.baseShape[closest] = this.baseShape[closest].subtract(this.baseShape[closest].unit.scale(10))
+       // this.baseShape[closest] = this.baseShape[closest].subtract(this.baseShape[closest].unit.scale(10))
+       this.ttl = 0
+       const opposite = this.findClosestPoint(reloc.scale(-1))
+       console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
+       objects.push(new SpaceObject(this.s, this.v, split(this.baseShape, ...[closest, opposite].sort())))
     }
     }
     findClosestPoint (reloc) {

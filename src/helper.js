@@ -13,3 +13,7 @@ function putInOrbit(g, s) {
   const r = s.subtract(g.s)
   return r.rotate(Math.PI / 2).unit.scale(Math.sqrt(g.mass / r.mag))
 }
+function split(a, si, fi) {
+  let aa = a.concat(a)
+  return [aa.slice(si, fi+1), aa.slice(fi, aa.length+si+1)]
+}
