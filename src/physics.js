@@ -129,7 +129,7 @@ function updatePhysics (dt) {
     })
 }
 function update(t) {
-    let itt = 100
+    let itt = 5
     let dt = 0.05/itt //(t - lastTime) / 50 //fix
     for(let i = 0; i<itt; i++) { updatePhysics(dt) }
     
