@@ -5,6 +5,9 @@ function calculateGravity(g, s) {
   const r = s.subtract(g.s)
   return r.unit.scale(-g.mass / r.mag ** 2)
 }
+function calculateGravities (a,s) {
+  return a.reduce((p,c) => p.add(calculateGravity(c, s)), new Vec(0,0))
+}
 function gravitationalPotential(g, s) {
   const r = s.subtract(g.s)
   return -g.mass / r.mag

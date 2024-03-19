@@ -99,13 +99,13 @@ class SpaceObject {
             if(this.mass < 500) {
                 this.ttl = 0
             }
-            else if(this.mass < 4000 && this.age > 10) {
+            else if(this.mass < 10000 && this.age > 10 && j.mag>20000) {
                 this.ttl = 0
             const opposite = this.findClosestPoint(reloc.scale(-1))
             const [a, b] = split(this.baseShape, ...[closest, opposite].sort())
            // console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
-            objects.push(new SpaceObject(this.s, this.v, [...a, new Vec(0, 0)]))
-            objects.push(new SpaceObject(this.s, this.v, [...b, new Vec(0, 0)]))
+            objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(Math.PI/2).unit), [...a, new Vec(0, 0)]))
+            objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(-Math.PI/2).unit), [...b, new Vec(0, 0)]))
             }
             else {
                 this.baseShape[closest] = this.baseShape[closest].subtract(this.baseShape[closest].unit.scale(10))

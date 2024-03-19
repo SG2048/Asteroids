@@ -4,14 +4,16 @@ let objects = [
     new SpaceObject(new Vec(250, 250), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
 let gravityObjects = [
-    { s: new Vec(250, 250), mass: 300 }
+    { s: new Vec(250, 250), mass: 1400 },
+    { s: new Vec(125, 375), mass: 7000 }
 ]
-let grid = [100]
+let grid = [100, 200, 300]
 for (const n of grid) {
     for (const m of grid) {
         objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(52, 10), 0, 99999))
     }
 }
+let debugMode = true
 let lastTime = 0
 let keyLog = {}
 document.addEventListener("keydown", (e) => {
@@ -21,6 +23,9 @@ document.addEventListener("keydown", (e) => {
     }
     if (e.key === "o") {
         objects.forEach((o) => o.v = putInOrbit(gravityObjects[0], o.s))
+    }
+    if (e.key === "d") {
+        debugMode = !debugMode
     }
 })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
@@ -52,12 +57,15 @@ function draw() {
         // ctx.font = "15px Arial";
         const ke = Math.round(o.kineticEnergy)
         const pe = gravitationalPotential(gravityObjects[0], o.s)*o.mass
+        if(debugMode) {
         dl.fillText(ke.toFixed(1), o.s.x, o.s.y, "red")
         dl.fillText(pe.toFixed(1), o.s.x, o.s.y + 20, "blue")
         dl.fillText((ke+pe).toFixed(1), o.s.x-100, o.s.y, "green")
+        dl.drawArrowRel(o.s, calculateGravities(gravityObjects, o.s).scale(2500), "green")
+        }
         //dl.drawArrowRel(new Vec(100, 100), o.v.scale(5))
         //ctx.strokeStyle = "red"
-        dl.drawArrowRel(o.s, calculateGravity(gravityObjects[0], o.s).scale(2500), "green")
+        // dl.drawArrowRel(o.s, calculateGravity(gravityObjects[0], o.s).scale(2500), "green")
         // ctx.strokeStyle = "black"
         dl.drawShape(o.history, true, "white")
         //dl.drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
@@ -114,7 +122,7 @@ function doCollisions(o, oo, p) {
 }
 function updatePhysics (dt) {
     objects.forEach((o, i) => {
-        o.update(dt, calculateGravity(gravityObjects[0], o.s))
+        o.update(dt, calculateGravities(gravityObjects, o.s))
         o.checkBounds(500, 500)
         //o.applyGravity(gravityObjects[0], dt)
         if (o.ttl < 0) { objects.splice(i, 1) }
