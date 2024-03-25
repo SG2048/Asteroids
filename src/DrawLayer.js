@@ -1,5 +1,5 @@
 class DrawLayer {
-    constructor (ctx, defaultStroke = "black", defaultFill = "white", defaultText = "black") {
+    constructor(ctx, defaultStroke = "black", defaultFill = "white", defaultText = "black") {
         this.ctx = ctx
         this.defaultStroke = defaultStroke
         this.defaultFill = defaultFill
@@ -22,15 +22,15 @@ class DrawLayer {
         this.ctx.lineTo(x2, y2)
         //this.ctx.closePath()
         this.ctx.stroke()
-        this.ctx.strokeStyle =  this.defaultStroke
+        this.ctx.strokeStyle = this.defaultStroke
     }
     fillText(text, x, y, col = defaultText) {
         this.ctx.fillStyle = col
         this.ctx.fillText(text, x, y)
         this.ctx.fillStyle = this.defaultText
     }
-    drawLineRel(x, y, dx, dy) {
-        this.drawLineAbs(x, y, x + dx, y + dy)
+    drawLineRel(x, y, dx, dy, col = "white") {
+        this.drawLineAbs(x, y, x + dx, y + dy, col)
     }
     drawArrowRel(a, da, col = "white") {
         const end = a.add(da)

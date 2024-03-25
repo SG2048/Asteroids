@@ -1,5 +1,5 @@
 class SpaceObject {
-    constructor(s, v, baseShape, theta = 0, ttl = 999999, type = "asteroid") {
+    constructor(s, v, baseShape, theta = 0, ttl = 999999, type = "asteroid", density = 1) {
         this.s = s
         this.v = v
         this.baseShape = baseShape
@@ -11,11 +11,12 @@ class SpaceObject {
         this.historyCooldown = 0
         this.type = type
         this.age = 0
+        this.density = density
         this.reCenter()
     }
     update(dt, gg) {
         this.ttl -= dt
-        this.age+=dt
+        this.age += dt
         this.cooldown -= dt
         this.s = this.s.add(this.v.scale(dt))
         //this.v = this.v.scale(0.995)
@@ -95,27 +96,27 @@ class SpaceObject {
             this.ttl = 0
         }
         if (this.type === "asteroid") {
-            console.log(objects, this.baseShape, this.mass)
-            if(this.mass < 500) {
+            //console.log(objects, this.baseShape, this.mass)
+            if (this.mass < 500) {
                 this.ttl = 0
             }
-            else if(this.mass < 10000 && this.age > 10 && j.mag>20000) {
+            else if (this.mass < 10000 && this.age > 10 && j.mag > 20000) {
                 this.ttl = 0
-            const opposite = this.findClosestPoint(reloc.scale(-1))
-            const [a, b] = split(this.baseShape, ...[closest, opposite].sort())
-           // console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
-            objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(Math.PI/2).unit), [...a, new Vec(0, 0)]))
-            objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(-Math.PI/2).unit), [...b, new Vec(0, 0)]))
+                const opposite = this.findClosestPoint(reloc.scale(-1))
+                const [a, b] = split(this.baseShape, ...[closest, opposite].sort())
+                // console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
+                objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(Math.PI / 2).unit), [...a, new Vec(0, 0)]))
+                objects.push(new SpaceObject(this.s, this.v.add(reloc.rotate(-Math.PI / 2).unit), [...b, new Vec(0, 0)]))
             }
             else {
                 this.baseShape[closest] = this.baseShape[closest].subtract(this.baseShape[closest].unit.scale(10))
             }
-        //     //
-        //     this.ttl = 0
-        //     const opposite = this.findClosestPoint(reloc.scale(-1))
-        //     const [a, b] = split(this.baseShape, ...[closest, opposite].sort())
-        //    // console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
-        //     objects.push(new SpaceObject(this.s, this.v, [...a, new Vec(0, 0)]))
+            //     //
+            //     this.ttl = 0
+            //     const opposite = this.findClosestPoint(reloc.scale(-1))
+            //     const [a, b] = split(this.baseShape, ...[closest, opposite].sort())
+            //    // console.log(...[closest, opposite].sort(), split(this.baseShape, ...[closest, opposite].sort()))
+            //     objects.push(new SpaceObject(this.s, this.v, [...a, new Vec(0, 0)]))
         }
     }
     findClosestPoint(reloc) {
