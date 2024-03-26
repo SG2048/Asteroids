@@ -15,7 +15,7 @@ for (const n of grid) {
         objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(52, 10), 0, 99999))
     }
 }
-let debugMode = true
+let debugMode = 0
 let lastTime = 0
 let keyLog = {}
 document.addEventListener("keydown", (e) => {
@@ -27,7 +27,8 @@ document.addEventListener("keydown", (e) => {
         //objects.forEach((o) => o.v = putInOrbit(gravityObjects[0], o.s))
     }
     if (e.key === "d") {
-        debugMode = !debugMode
+        debugMode = (debugMode + 1) % 5
+        console.log(debugMode)
     }
 })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
@@ -36,37 +37,38 @@ draw()
 
 function draw() {
     dl.reset()
-    objects.forEach((o) => dl.drawShape(o.shape))
     objects.forEach((o, i) => {
-        dl.drawArrowRel(o.s, o.v.scale(20))
-        const ke = Math.round(o.kineticEnergy)
-        const pe = gravitationalPotentials(objects, o.s) * o.mass
-        if (debugMode) {
+        dl.drawShape(o.shape)
+        if (debugMode === 1) {
+            dl.drawShape(o.history, true, "white")
+            dl.drawArrowRel(o.s, o.v.scale(20))
+            dl.drawArrowRel(o.s, calculateGravities(objects, o.s).scale(2500), "green")
+        }
+        if (debugMode === 2) {
+            let vectorStart = new Vec(300, 300)
+            objects.map((o) => o.v.scale(o.mass / 100)).forEach((v) => {
+                dl.drawArrowRel(vectorStart, v, "grey")
+                vectorStart = vectorStart.add(v)
+            })
+            dl.drawArrowRel(new Vec(300, 300), objects.map((o) => o.v.scale(o.mass)).reduce(Vec.add).scale(1 / 100), "white")
+        }
+        if (debugMode === 3) {
+            const ke = Math.round(o.kineticEnergy)
+            const pe = gravitationalPotentials(objects, o.s) * o.mass
             dl.fillText(ke.toFixed(1), o.s.x, o.s.y, "red")
             dl.fillText(pe.toFixed(1), o.s.x, o.s.y + 20, "blue")
             dl.fillText((ke + pe).toFixed(1), o.s.x - 100, o.s.y, "green")
-            dl.drawArrowRel(o.s, calculateGravities(objects, o.s).scale(2500), "green")
         }
-        //dl.drawArrowRel(new Vec(100, 100), o.v.scale(5))
-        // dl.drawArrowRel(o.s, calculateGravity(gravityObjects[0], o.s).scale(2500), "green")
-        dl.drawShape(o.history, true, "white")
-        //dl.drawArrowRel(new Vec(50 * i, 200), o.v.scale(5))
-    }
-    )
-    let gridTwo = [50, 100, 150, 200, 250, 300, 350, 400, 450]
-    for (const n of gridTwo) {
-        for (const m of gridTwo) {
-            //ctx.fillText(gravitationalPotential(gravityObjects[0], new Vec(n, m)).toFixed(1), n, m)
-            //drawLineRel(n, m, ...calculateGravity(gravityObjects[0], new Vec(n, m)).scale(1000))
+    })
+    if (debugMode === 4) {
+        let gridTwo = [50, 100, 150, 200, 250, 300, 350, 400, 450]
+        for (const n of gridTwo) {
+            for (const m of gridTwo) {
+                dl.fillText(gravitationalPotentials(objects, new Vec(n, m)).toFixed(1), n, m, "grey")
+                dl.drawLineRel(n, m, ...calculateGravities(objects, new Vec(n, m)).scale(10))
+            }
         }
     }
-    dl.drawArrowRel(new Vec(300, 300), objects.map((o) => o.v.scale(o.mass)).reduce(Vec.add).scale(1 / 100), "white")
-    let vectorStart = new Vec(300, 300)
-    objects.map((o) => o.v.scale(o.mass / 100)).forEach((v) => {
-        dl.drawArrowRel(vectorStart, v, "grey")
-        vectorStart = vectorStart.add(v)
-    }
-    )
 }
 
 function doCollisions(o, oo, p) {

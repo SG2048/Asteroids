@@ -24,7 +24,7 @@ class DrawLayer {
         this.ctx.stroke()
         this.ctx.strokeStyle = this.defaultStroke
     }
-    fillText(text, x, y, col = defaultText) {
+    fillText(text, x, y, col = this.defaultText) {
         this.ctx.fillStyle = col
         this.ctx.fillText(text, x, y)
         this.ctx.fillStyle = this.defaultText
