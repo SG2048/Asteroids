@@ -1,17 +1,19 @@
 class DrawLayer {
-    constructor(ctx, defaultStroke = "black", defaultFill = "white", defaultText = "black") {
+    constructor(ctx, defaultStroke = "black", defaultFill = "white", defaultText = "black", height = 800, width = 800) {
         this.ctx = ctx
         this.defaultStroke = defaultStroke
         this.defaultFill = defaultFill
         this.defaultText = defaultText
+        this.height = height
+        this.width = width
         this.reset()
     }
     reset() {
         this.ctx.fillStyle = this.defaultFill
         this.ctx.strokeStyle = this.defaultStroke
-        this.ctx.clearRect(0, 0, 500, 500)
-        this.ctx.fillRect(0, 0, 500, 500)
-        this.ctx.strokeRect(0, 0, 500, 500)
+        this.ctx.clearRect(0, 0, this.width, this.height)
+        this.ctx.fillRect(0, 0, this.width, this.height)
+        this.ctx.strokeRect(0, 0, this.width, this.height)
         //ctx.beginPath()
         this.ctx.font = "15px Arial";
     }

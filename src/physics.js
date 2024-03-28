@@ -1,15 +1,17 @@
 //let canvas = document.getElementById("simulationWindow")
 const dl = new DrawLayer(document.getElementById("simulationWindow").getContext("2d"), "white", "black", "white")
 const G = 1
+let height = 800
+let width = 800
 let objects = [
-    new SpaceObject(new Vec(250, 250), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
+    new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
 let gravityObjects = [
     { s: new Vec(250, 250), mass: 1400 },
     { s: new Vec(125, 375), mass: 7000 },
     { s: new Vec(200, 450), mass: 4010 }
 ]
-let grid = [100, 200, 300]
+let grid = [200, 400, 600]
 for (const n of grid) {
     for (const m of grid) {
         objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(52, 10), 0, 99999))
@@ -38,7 +40,10 @@ draw()
 function draw() {
     dl.reset()
     objects.forEach((o, i) => {
-        dl.drawShape(o.shape)
+        let gb = Math.round(255/20*o.health)
+        let col = o.health<20 ? "rgb(255," + gb + "," + gb + ")" : "white"
+        //console.log(gb, col)
+        dl.drawShape(o.shape, false, col)
         if (debugMode === 1) {
             dl.drawShape(o.history, true, "white")
             dl.drawArrowRel(o.s, o.v.scale(20))
@@ -85,7 +90,7 @@ function doCollisions(o, oo, p) {
 function updatePhysics(dt) {
     objects.forEach((o, i) => {
         o.update(dt, calculateGravities(objects, o.s))
-        o.checkBounds(500, 500)
+        o.checkBounds(width, height)
         //o.applyGravity(gravityObjects[0], dt)
         if (o.ttl < 0) { objects.splice(i, 1) }
     }
@@ -99,7 +104,7 @@ function updatePhysics(dt) {
     })
 }
 function update(t) {
-    let itt = 5
+    let itt = 2
     let dt = 0.05 / itt //(t - lastTime) / 50 //fix
     for (let i = 0; i < itt; i++) { updatePhysics(dt) }
 
