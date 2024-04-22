@@ -1,15 +1,8 @@
-//let canvas = document.getElementById("simulationWindow")
 const dl = new DrawLayer(document.getElementById("simulationWindow").getContext("2d"), "white", "black", "white")
 const G = 1
-let height = 800
-let width = 800
+let screenSize = new Vec(800, 800)
 let objects = [
-    new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
-]
-let gravityObjects = [
-    { s: new Vec(250, 250), mass: 1400 },
-    { s: new Vec(125, 375), mass: 7000 },
-    { s: new Vec(200, 450), mass: 4010 }
+    new SpaceObject(new Vec(350, 350), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
 let grid = [200, 400, 600]
 for (const n of grid) {
@@ -43,7 +36,7 @@ function draw() {
         let gb = Math.round(255/20*o.health)
         let col = o.health<20 ? "rgb(255," + gb + "," + gb + ")" : "white"
         //console.log(gb, col)
-        dl.drawShape(o.shape, false, col)
+        dl.drawShape(o.shape, false, col, objects[0].s.scale(-1).add(screenSize.scale(0.5)))
         if (debugMode === 1) {
             dl.drawShape(o.history, true, "white")
             dl.drawArrowRel(o.s, o.v.scale(20))
@@ -66,7 +59,7 @@ function draw() {
         }
     })
     if (debugMode === 4) {
-        let gridTwo = [50, 100, 150, 200, 250, 300, 350, 400, 450]
+        let gridTwo = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750]
         for (const n of gridTwo) {
             for (const m of gridTwo) {
                 dl.fillText(gravitationalPotentials(objects, new Vec(n, m)).toFixed(1), n, m, "grey")
@@ -90,7 +83,7 @@ function doCollisions(o, oo, p) {
 function updatePhysics(dt) {
     objects.forEach((o, i) => {
         o.update(dt, calculateGravities(objects, o.s))
-        o.checkBounds(width, height)
+        o.checkBounds(...screenSize)
         //o.applyGravity(gravityObjects[0], dt)
         if (o.ttl < 0) { objects.splice(i, 1) }
     }
