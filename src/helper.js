@@ -30,3 +30,12 @@ function split(a, si, fi) {
   let aa = a.concat(a)
   return [aa.slice(si, fi + 1), aa.slice(fi, a.length + si + 1)]
 }
+function makeGrid(interval, start, finish) {
+  let s = Math.floor(start/interval)
+  let f = Math.ceil(finish/interval)
+  let grid = [...Array(f-s+1).keys()]
+  .map((v,i,a) => v+s)
+  .map((v,i,a) => v*interval)
+  return grid
+}
+console.log(makeGrid(10, 12, 52))
