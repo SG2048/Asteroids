@@ -4,10 +4,10 @@ let screenSize = new Vec(800, 800)
 let objects = [
     new SpaceObject(new Vec(350, 350), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
-let grid = [200, 400, 600]
+let grid = [200]
 for (const n of grid) {
     for (const m of grid) {
-        objects.push(new SpaceObject(new Vec(m, n), new Vec(-1, 1), SpaceObject.makeAsteroidShape(52, 10), 0, 99999))
+        objects.push(new SpaceObject(new Vec(m, n), new Vec(0, 0), SpaceObject.makeAsteroidShape(52, 10), 0, 99999, "asteroid", 1))
     }
 }
 let debugMode = 0
@@ -19,7 +19,8 @@ document.addEventListener("keydown", (e) => {
         console.log(objects[0].momentOfInertia)
     }
     if (e.key === "o") {
-        //objects.forEach((o) => o.v = putInOrbit(gravityObjects[0], o.s))
+        objects.forEach((o) => o.v = calculateOrbitVelocities(objects, o.s))
+        objects.forEach((o) => console.log(o.v))
     }
     if (e.key === "d") {
         debugMode = (debugMode + 1) % 5
@@ -37,8 +38,10 @@ function draw() {
         let gb = Math.round(255/20*o.health)
         let col = o.health<20 ? "rgb(255," + gb + "," + gb + ")" : "white"
         //console.log(gb, col)
-        dl.drawShape(o.shape, false, col, objects[0].s.scale(-1).add(screenSize.scale(0.5)))
+        dl.drawShape(o.shape, false, col, offset)
         dl.drawShape(o.history, true, "grey", offset)
+        makeGrid(100, 0, 800).forEach((v, i, a) => dl.drawLineAbs(0,v,800,v,"rgb(50,50,50)",offset))
+        makeGrid(100, 0, 800).forEach((v, i, a) => dl.drawLineAbs(v,0,v,800,"rgb(50,50,50)",offset))
         if (debugMode === 1) {
             dl.drawShape(o.history, true, "white", offset)
             dl.drawArrowRel(o.s, o.v.scale(20),"white",offset)

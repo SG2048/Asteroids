@@ -129,7 +129,7 @@ class SpaceObject {
     }
     get mass() {
         let triangles = this.localTriangles
-        return triangles.reduce((p, c, i, a) => p + c.area, 0)
+        return triangles.reduce((p, c, i, a) => p + c.area, 0)*this.density
     }
     get centerOfMass() {
         let triangles = this.localTriangles
