@@ -22,6 +22,9 @@ class Vec {
     scale(s) {
         return new Vec(this.x * s, this.y * s)
     }
+    power(p) {
+        return this.unit.scale(this.mag**p)
+    }
     rotate(th) {
         return new Vec(this.x * Math.cos(th) - this.y * Math.sin(th), this.y * Math.cos(th) + this.x * Math.sin(th))
     }
@@ -47,3 +50,4 @@ class Vec {
         return a.add(b)
     }
 }
+console.log(new Vec(2,-2).power(-2))

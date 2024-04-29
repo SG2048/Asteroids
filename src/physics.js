@@ -2,9 +2,9 @@ const dl = new DrawLayer(document.getElementById("simulationWindow").getContext(
 const G = 1
 let screenSize = new Vec(800, 800)
 let objects = [
-    new SpaceObject(new Vec(350, 350), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
+    new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
-let grid = [200]
+let grid = [200,400]
 for (const n of grid) {
     for (const m of grid) {
         objects.push(new SpaceObject(new Vec(m, n), new Vec(0, 0), SpaceObject.makeAsteroidShape(52, 10), 0, 99999, "asteroid", 1))
@@ -19,7 +19,7 @@ document.addEventListener("keydown", (e) => {
         console.log(objects[0].momentOfInertia)
     }
     if (e.key === "o") {
-        objects.forEach((o) => o.v = calculateOrbitVelocities(objects, o.s))
+        objects.forEach((o) => o.v = calculateOrbitVelocities(objects, o.s, o.mass))
         objects.forEach((o) => console.log(o.v))
     }
     if (e.key === "d") {
