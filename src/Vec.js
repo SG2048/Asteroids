@@ -23,6 +23,9 @@ class Vec {
         return new Vec(this.x * s, this.y * s)
     }
     power(p) {
+        if(this.mag < 0.0000000000001) {
+            return new Vec(0,0)
+        }
         return this.unit.scale(this.mag**p)
     }
     rotate(th) {
@@ -32,6 +35,9 @@ class Vec {
         return (this.x * a.y) - (a.x * this.y)
     }
     get unit() {
+        if(this.mag < 0.0000000000001) {
+            return new Vec(0,0)
+        }
         return this.scale(1 / this.mag)
     }
     get theta() {
@@ -50,4 +56,9 @@ class Vec {
         return a.add(b)
     }
 }
-console.log(new Vec(2,-2).power(-2))
+let v = new Vec(0,0)
+console.log(v.power(-2))
+console.log(v.power(1))
+console.log(v.power(2))
+console.log(v.power(0.5))
+console.log(v.power(2).power(0.5))

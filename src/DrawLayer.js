@@ -24,8 +24,9 @@ class DrawLayer {
         this.ctx.stroke()
         this.ctx.strokeStyle = this.defaultStroke
     }
-    fillText(text, x, y, col = this.defaultText, offset = new Vec(0,0)) {
+    fillText(text, x, y, col = this.defaultText, offset = new Vec(0,0), fontSize) {
         this.ctx.fillStyle = col
+        this.ctx.font = "30px Arial"
         this.ctx.fillText(text, ...offset.addXY(x, y))
         this.ctx.fillStyle = this.defaultText
     }

@@ -1,6 +1,7 @@
 const dl = new DrawLayer(document.getElementById("simulationWindow").getContext("2d"), "white", "black", "white")
 const G = 1
 let screenSize = new Vec(800, 800)
+let gameRunning = true
 let objects = [
     new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
 ]
@@ -26,6 +27,9 @@ document.addEventListener("keydown", (e) => {
         debugMode = (debugMode + 1) % 5
         console.log(debugMode)
     }
+    if(e.key === "r" && gameRunning === false) {
+        console.log("the game has been reset")
+    }
 })
 document.addEventListener("keyup", (e) => { keyLog[e.key] = false })
 draw()
@@ -35,8 +39,8 @@ function draw() {
     dl.reset()
     let offset = objects[0].s.scale(-1).add(screenSize.scale(0.5))
     objects.forEach((o, i) => {
-        let gb = Math.round(255/20*o.health)
-        let col = o.health<20 ? "rgb(255," + gb + "," + gb + ")" : "white"
+        let gb = Math.round(255/5*o.health)
+        let col = o.health<5 ? "rgb(255," + gb + "," + gb + ")" : "white"
         //console.log(gb, col)
         dl.drawShape(o.shape, false, col, offset)
         dl.drawShape(o.history, true, "grey", offset)
@@ -73,6 +77,12 @@ function draw() {
         }
     }
 }
+function drawGameOverScreen() {
+    dl.reset()
+    dl.fillText("game over", ...screenSize.scale(0.5), "white")
+    dl.fillText("press R to reset", 400, 450, "white")
+    console.log("hello")
+}
 
 function doCollisions(o, oo, p) {
     let collisionDirection = (o.s.subtract(oo.s)).unit
@@ -104,13 +114,20 @@ function updatePhysics(dt) {
 function update(t) {
     let itt = 2
     let dt = 0.05 / itt //(t - lastTime) / 50 //fix
+    if(objects[0].health <= 0) {
+        console.log("game over")
+        drawGameOverScreen()
+        gameRunning = false
+    }
     for (let i = 0; i < itt; i++) { updatePhysics(dt) }
 
 
     objects[0].accelerate(keyLog)
-    draw()
     lastTime = t
+    if(gameRunning) {
     setTimeout(update, 1)
+    draw()
+    }
 }
 setTimeout(update, 1)
 
