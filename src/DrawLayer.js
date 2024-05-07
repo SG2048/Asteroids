@@ -14,6 +14,9 @@ class DrawLayer {
         this.ctx.strokeRect(0, 0, ...screenSize)
         //ctx.beginPath()
         this.ctx.font = "15px Arial";
+        // this.ctx.beginPath()
+        // this.ctx.arc(100,100,20,0,Math.PI*2)
+        // this.ctx.stroke()
     }
     drawLineAbs(x1, y1, x2, y2, col = this.defaultStroke, offset = new Vec(0,0)) {
         this.ctx.strokeStyle = col
@@ -40,6 +43,13 @@ class DrawLayer {
         this.drawLineRel(a.x, a.y, da.x, da.y, col, offset)
         this.drawLineRel(end.x, end.y, side1.x, side1.y, col, offset)
         this.drawLineRel(end.x, end.y, side2.x, side2.y, col, offset)
+    }
+    drawCircle(x, y, size, col = this.defaultStroke, offset = new Vec(0,0)) {
+        this.ctx.strokeStyle = col
+        this.ctx.beginPath()
+        this.ctx.arc(...offset.addXY(x, y), size, 0, Math.PI*2)
+        this.ctx.stroke()
+        this.ctx.strokeStyle = this.defaultStroke
     }
     drawShape(s, dontClose, col = this.defaultStroke, offset = new Vec(0,0)) {
         this.ctx.strokeStyle = col

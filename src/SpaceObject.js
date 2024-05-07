@@ -13,6 +13,7 @@ class SpaceObject {
         this.age = 0
         this.density = density
         this.health = 5
+        this.shield = 5
         this.reCenter()
     }
     update(dt, gg) {
@@ -50,11 +51,11 @@ class SpaceObject {
     accelerate(keys) {
         if (keys["ArrowUp"]) this.v = this.v.add(this.facing.scale(0.35))
         if (keys["ArrowDown"]) this.v = this.v.add(this.facing.scale(-1).scale(0.35))
-        if (keys["ArrowRight"]) this.theta += 0.05, this.omega = 0
-        if (keys["ArrowLeft"]) this.theta -= 0.05, this.omega = 0
+        if (keys["ArrowRight"]) this.theta += 0.02, this.omega = 0
+        if (keys["ArrowLeft"]) this.theta -= 0.02, this.omega = 0
         if (keys[" "] && this.cooldown < 0) {
-            this.cooldown = 5
-            objects.push(new SpaceObject(this.s.add(this.facing.scale(80)), this.facing.scale(10).add(this.v), SpaceObject.makeTriangleShape(20, 7), this.theta, 200, "bullet"))
+            this.cooldown = 2
+            objects.push(new SpaceObject(this.s.add(this.facing.scale(40)), this.facing.scale(30).add(this.v), SpaceObject.makeTriangleShape(15, 5), this.theta, 100, "bullet"))
             this.v = this.v.add(this.facing.scale(-0.5))
         }
     }
@@ -92,8 +93,13 @@ class SpaceObject {
         const closest = this.findClosestPoint(reloc)
         if (this.type === "ship") {
             console.log("the ship has been hit")
-            this.health -= 1
-            console.log(this.health)
+            if(this.shield > 0) {
+            this.shield -= 1
+            }
+            else {
+                this.health-=1
+            }
+            console.log(this.health, this.shield)
         }
         if (this.type === "bullet") {
             this.ttl = 0

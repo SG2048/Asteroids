@@ -1,5 +1,6 @@
 const dl = new DrawLayer(document.getElementById("simulationWindow").getContext("2d"), "white", "black", "white")
 const G = 1
+let level = 1
 let screenSize = new Vec(800, 800)
 let gameRunning = true
 let winCondition;
@@ -7,7 +8,7 @@ let objects;
 let grid;
 let debugMode = 0
 let lastTime = 0
-loadLevel()
+loadLevel(level)
 let keyLog = {}
 document.addEventListener("keydown", (e) => {
     keyLog[e.key] = true
@@ -24,7 +25,7 @@ document.addEventListener("keydown", (e) => {
     }
     if (e.key === "r" && gameRunning === false) {
         console.log("the game has been reset")
-        loadLevel()
+        loadLevel(level)
         gameRunning = true
         update()
 
@@ -48,7 +49,7 @@ function loadLevel(level = 1) {
         objects = [
             new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
         ]
-        grid = [200, 400]
+        grid = [200]
         for (const n of grid) {
             for (const m of grid) {
                 objects.push(new SpaceObject(new Vec(m, n), new Vec(0, 0), SpaceObject.makeAsteroidShape(52, 10), 0, 99999, "asteroid", 1))
@@ -56,10 +57,16 @@ function loadLevel(level = 1) {
         }
         winCondition = () => !objects.find((v, i, a) => v.type === "asteroid")
     }
+    else {
+        dl.reset()
+        console.log("level is too high")
+        drawGameOverScreen("you win the entire game")
+    }
 }
 function draw() {
     dl.reset()
     let offset = objects[0].s.scale(-1).add(screenSize.scale(0.5))
+    for(let i = 0; i<objects[0].shield; i++){dl.drawCircle(...objects[0].s, 40+4*i, "white", offset)}
     objects.forEach((o, i) => {
         let gb = Math.round(255 / 5 * o.health)
         let col = o.health < 5 ? "rgb(255," + gb + "," + gb + ")" : "white"
@@ -142,7 +149,8 @@ function update(t) {
         gameRunning = false
     }
     if (winCondition()) {
-        console.log("you win")
+        level = level+1
+        console.log("you win this level")
         gameRunning = false
         drawGameOverScreen("you win")
     }
