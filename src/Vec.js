@@ -55,6 +55,15 @@ class Vec {
     static add(a, b) {
         return a.add(b)
     }
+    static zero() {
+        return new Vec(0, 0)
+    }
+    static random(l = 1) {
+        return new Vec(l,0).rotate(Math.random()*Math.PI*2)
+    }
+    static east() {
+        return new Vec(1,0)
+    }
 }
 let v = new Vec(0,0)
 console.log(v.power(-2))

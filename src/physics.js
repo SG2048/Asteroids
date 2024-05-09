@@ -45,7 +45,7 @@ function loadLevel(level = 1) {
 
         winCondition = () => !objects.find((v, i, a) => v.type === "asteroid")
     }
-    if (level === 2) {
+    else if (level === 2) {
         objects = [
             new SpaceObject(new Vec(500, 500), new Vec(0, 0), SpaceObject.makeTriangleShape(50, 20), 0, 99999, "ship"),
         ]
@@ -55,9 +55,11 @@ function loadLevel(level = 1) {
                 objects.push(new SpaceObject(new Vec(m, n), new Vec(0, 0), SpaceObject.makeAsteroidShape(52, 10), 0, 99999, "asteroid", 1))
             }
         }
+        objects.forEach((o) => o.v = calculateOrbitVelocities(objects, o.s, o.mass))
         winCondition = () => !objects.find((v, i, a) => v.type === "asteroid")
     }
     else {
+        gameRunning = false
         dl.reset()
         console.log("level is too high")
         drawGameOverScreen("you win the entire game")
@@ -66,7 +68,7 @@ function loadLevel(level = 1) {
 function draw() {
     dl.reset()
     let offset = objects[0].s.scale(-1).add(screenSize.scale(0.5))
-    for(let i = 0; i<objects[0].shield; i++){dl.drawCircle(...objects[0].s, 40+4*i, "white", offset)}
+    for(let i = 0; i<objects[0].shield; i++){dl.drawCircle(...objects[0].s.add(Vec.random(1)), 40+4*i, "grey", offset)}
     objects.forEach((o, i) => {
         let gb = Math.round(255 / 5 * o.health)
         let col = o.health < 5 ? "rgb(255," + gb + "," + gb + ")" : "white"
